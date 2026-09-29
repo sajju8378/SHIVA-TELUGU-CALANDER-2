@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7f1d1d" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+    <radialGradient id="sun192" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </radialGradient>
+  </defs>
+  <rect width="192" height="192" rx="36" fill="url(#bg192)" />
+  <rect x="6" y="6" width="180" height="180" rx="30" fill="none" stroke="#facc15" stroke-width="2" stroke-opacity="0.8" />
+  <circle cx="96" cy="85" r="42" fill="url(#sun192)" />
+  <circle cx="96" cy="85" r="30" fill="#7f1d1d" />
+  <path d="M90 70 A16 16 0 1 0 108 95 A13 13 0 1 1 90 70 Z" fill="#fef08a" />
+  <text x="96" y="156" text-anchor="middle" fill="#fef08a" font-family="'Noto Sans Telugu', sans-serif" font-size="14" font-weight="bold">పంచాంగం 2027</text>
+</svg>

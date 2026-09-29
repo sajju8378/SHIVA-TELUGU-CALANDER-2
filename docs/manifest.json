@@ -1,0 +1,24 @@
+{
+  "name": "తెలుగు పంచాంగం 2027 - Telugu Panchangam",
+  "short_name": "పంచాంగం 2027",
+  "description": "Authentic Telugu Hindu Panchangam and Calendar for 2027 with high-precision astronomical calculations, Amanta lunar system, Tithi, Nakshatra, Muhurtam, and Festivals.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#b91c1c",
+  "icons": [
+    {
+      "src": "./icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
