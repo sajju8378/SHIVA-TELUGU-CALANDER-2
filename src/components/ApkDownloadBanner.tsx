@@ -109,47 +109,27 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
             </button>
           </div>
 
-          {/* OPTION 2: GITHUB ACTIONS BUILD APK ARTIFACT */}
+          {/* OPTION 2: DIRECT DOWNLOAD TELUGU PANCHANGAM APK */}
           <div className="p-4 rounded-xl bg-slate-950/80 border border-emerald-700/60 space-y-2.5">
             <div className="flex items-center space-x-2 text-emerald-300 font-bold text-sm">
-              <Layers className="w-4 h-4 text-emerald-400" />
-              <span>{isTe ? 'GitHub Actions ద్వారా APK బిల్డ్ ఆర్టిఫాక్ట్' : 'GitHub Actions APK Build Artifact'}</span>
+              <Download className="w-4 h-4 text-emerald-400" />
+              <span>{isTe ? 'నేరుగా APK ఫైల్ డౌన్‌లోడ్ (Direct Download)' : 'Direct Standalone APK Download'}</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               {isTe
-                ? 'GitHub Actions లో స్వయంచాలకంగా Gradle ద్వారా నిజమైన Android APK బిల్డ్ చేయబడి ఆర్టిఫాక్ట్‌గా భద్రపరచబడుతుంది. మీరు GitHub Actions పేజీ నుండి కూడా తాజా APKని పొందవచ్చు.'
-                : 'Built directly via GitHub Actions CI/CD using Gradle into an official signed APK package, preserved under Workflow Artifacts.'}
+                ? 'మెయిన్ రిపోజిటరీ నుండి నేరుగా Telugu-Panchangam-2027.apk ఫైల్ డౌన్‌లోడ్ అవుతుంది. ఎలాంటి Actions లేదా లాగిన్ అవసరం లేదు.'
+                : 'Directly download the Telugu-Panchangam-2027.apk file hosted on the main branch.'}
             </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <a
-                href="https://github.com/sajju8378/SHIVA-TELUGU-CALANDER/releases"
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-purple-950/70 border border-purple-600 hover:bg-purple-900 text-purple-200 font-semibold text-xs transition-colors"
-              >
-                <span>{isTe ? 'GitHub Releases (APK)' : 'GitHub Releases (APK)'}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
-              <a
-                href="https://github.com/sajju8378/SHIVA-TELUGU-CALANDER/actions"
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-emerald-950/70 border border-emerald-600 hover:bg-emerald-900 text-emerald-200 font-semibold text-xs transition-colors"
-              >
-                <span>{isTe ? 'GitHub Actions CI' : 'GitHub Actions CI'}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
+            <div className="pt-1">
               <button
                 onClick={handleDownload}
-                className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer"
+                className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-bold text-sm shadow-md transition-all cursor-pointer"
               >
-                {downloadTriggered ? <Check className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+                {downloadTriggered ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                 <span>
                   {downloadTriggered
-                    ? (isTe ? 'డౌన్‌లోడ్ అవుతోంది...' : 'Downloading...')
-                    : (isTe ? 'నేరుగా APK డౌన్‌లోడ్' : 'Direct APK Download')}
+                    ? (isTe ? 'డౌన్‌లోడ్ ప్రారంభమైంది!' : 'Download Started!')
+                    : (isTe ? 'Telugu-Panchangam-2027.apk డౌన్‌లోడ్ చేయండి' : 'Download Telugu-Panchangam-2027.apk')}
                 </span>
               </button>
             </div>
