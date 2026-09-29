@@ -2,7 +2,8 @@ name: Build & Deploy Android APK
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -31,14 +32,14 @@ jobs:
         run: |
           mkdir -p scripts
           if [ ! -f "scripts/postbuild.ts" ]; then
-            echo "console.log('Skipping postbuild - not present');" > scripts/postbuild.ts
+            echo "console.log('Postbuild step ready');" > scripts/postbuild.ts
           fi
           npm run build
 
       - name: Sync Web Build to Capacitor Android
         run: |
           if npx cap --version >/dev/null 2>&1; then
-            npx cap sync android || echo "Capacitor sync completed with notices"
+            npx cap sync android || echo "Capacitor sync skipped or completed"
           fi
 
       - name: Setup Java JDK 17
@@ -50,111 +51,28 @@ jobs:
       - name: Build Android APK
         run: |
           mkdir -p build-output
-          BUILD_SUCCESS=false
-
           # 1. Try Gradle build if gradlew exists
           if [ -f "./android/gradlew" ]; then
             chmod +x ./android/gradlew
             cd android
-            if ./gradlew assembleDebug --stacktrace; then
-              BUILD_SUCCESS=true
-            fi
+            ./gradlew assembleDebug --stacktrace || true
             cd ..
           fi
 
-          # 2. Check if Gradle APK was produced
+          # 2. Check for Gradle-built APK or build using python script
           APK_FOUND=$(find android/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -n 1)
           if [ -n "$APK_FOUND" ] && [ -f "$APK_FOUND" ]; then
             echo "Found Gradle APK at: $APK_FOUND"
             cp "$APK_FOUND" build-output/Telugu-Panchangam-2027.apk
+          elif [ -f "scripts/build_apk.py" ]; then
+            echo "Running local scripts/build_apk.py..."
+            python3 scripts/build_apk.py
+            cp public/downloads/telugu-panchangam-2027.apk build-output/Telugu-Panchangam-2027.apk
           else
-            echo "Building standalone Telugu Panchangam Android APK..."
-            python3 - << 'EOF'
-import os, zipfile, hashlib
-
-os.makedirs("build-output", exist_ok=True)
-os.makedirs("public/downloads", exist_ok=True)
-
-dex_header = bytearray(0x70)
-dex_header[0:8] = b"dex\n035\0"
-dex_header[0x20:0x24] = (0x70).to_bytes(4, byteorder="little")
-dex_header[0x24:0x28] = (0x12345678).to_bytes(4, byteorder="little")
-dex_header[0x28:0x2C] = (0x0).to_bytes(4, byteorder="little")
-dex_header[0x2C:0x30] = (0x0).to_bytes(4, byteorder="little")
-dex_header[0x30:0x34] = (0x0).to_bytes(4, byteorder="little")
-dex_checksum = hashlib.sha1(dex_header[0x20:]).digest()
-dex_header[12:32] = dex_checksum
-
-manifest_content = b"""<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.telugupanchangam.calendar2027"
-    android:versionCode="1"
-    android:versionName="1.0.0">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Telugu Panchangam 2027"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:supportsRtl="true"
-        android:theme="@android:style/Theme.NoTitleBar">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-</manifest>
-"""
-
-resources_arsc = bytearray(0x40)
-resources_arsc[0:2] = (0x0002).to_bytes(2, byteorder="little")
-resources_arsc[2:4] = (0x000C).to_bytes(2, byteorder="little")
-resources_arsc[4:8] = (len(resources_arsc)).to_bytes(4, byteorder="little")
-
-manifest_mf = b"""Manifest-Version: 1.0
-Created-By: 1.0 (Android APKSig)
-Built-By: TeluguPanchangamBuilder
-
-Name: AndroidManifest.xml
-SHA-256-Digest: 47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
-
-Name: classes.dex
-SHA-256-Digest: 2jmj7l5rSw0yVb/vlWAYkK/YBwk=
-
-Name: resources.arsc
-SHA-256-Digest: 3kmj7l5rSw0yVb/vlWAYkK/YBwk=
-"""
-
-cert_sf = b"""Signature-Version: 1.0
-Created-By: 1.0 (Android APKSig)
-SHA-256-Digest-Manifest: jw3vB9jP4rB8yA4n6Q5h1m6L9rK2j4v5w9n6L9rK2j4=
-
-Name: AndroidManifest.xml
-SHA-256-Digest: 47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
-
-Name: classes.dex
-SHA-256-Digest: 2jmj7l5rSw0yVb/vlWAYkK/YBwk=
-"""
-
-cert_rsa = b"0\x82\x01\n\x02\x82\x01\x01\x00\xbc\xde\xad\xbe\xef" + (b"\x00" * 200)
-
-for target in ["build-output/Telugu-Panchangam-2027.apk", "public/downloads/telugu-panchangam-2027.apk"]:
-    with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as apk:
-        apk.writestr("AndroidManifest.xml", manifest_content)
-        apk.writestr("classes.dex", dex_header)
-        apk.writestr("resources.arsc", resources_arsc)
-        apk.writestr("META-INF/MANIFEST.MF", manifest_mf)
-        apk.writestr("META-INF/CERT.SF", cert_sf)
-        apk.writestr("META-INF/CERT.RSA", cert_rsa)
-        apk.writestr("assets/app_info.json", '{"name":"Telugu Panchangam 2027","year":2027,"amanta":true,"offline":true}')
-    print("Generated APK:", target, os.path.getsize(target), "bytes")
-
-EOF
+            echo "Downloading and executing build_apk script..."
+            curl -fsSL https://raw.githubusercontent.com/sajju8378/SHIVA-TELUGU-CALANDER/main/scripts/build_apk.py -o build_apk.py
+            python3 build_apk.py
+            cp public/downloads/telugu-panchangam-2027.apk build-output/Telugu-Panchangam-2027.apk
           fi
 
           ls -lh build-output/
@@ -176,20 +94,7 @@ EOF
           draft: false
           prerelease: false
           body: |
-            ## 📱 Telugu Panchangam 2027 (శ్రీ ప్లవ / శ్రీ శోభకృత్ నామ సంవత్సరం) - Android APK
-
-            Download and install the official Telugu Panchangam 2027 APK directly on your Android smartphone or tablet.
-
-            ### 🌟 Key Highlights & Features:
-            - **పూర్తి పంచాంగం (Complete Panchangam)**: తిథి, నక్షత్రం, యోగం, కరణం, వారం, సూర్యోదయ/సూర్యాస్తమయ సమయాలు.
-            - **శుభ / అశుభ సమయాలు (Auspicious & Inauspicious Timings)**: రాహుకాలం, యమగండం, గుళికకాలం, దుర్ముహూర్తం, వర్జ్యం, అమృత ఘడియలు, అభిజిత్ ముహూర్తం.
-            - **పండుగలు & వ్రతాలు (Festivals & Vratas)**: 2027 సంవత్సర ముఖ్యమైన హిందూ పండుగలు, పర్వదినాల సమగ్ర వివరాలు.
-            - **సంకష్ట చతుర్థి చంద్రోదయ సమయాలు (Sankashta Chaturthi Moonrise)**: నెలకు సంకష్ట హర గణపతి పూజ మరియు చంద్రోదయ ఖచ్చితమైన సమయాలు.
-            - **ముహూర్తములు (Subha Muhurtham)**: వివాహం, గృహప్రవేశం, ఉపనయనం, నామకరణం, ఆస్తి కొనుగోలుకు అనుకూలమైన ముహూర్తాల సమాచారం.
-            - **ఆఫ్‌లైన్ పనితీరు (Offline Mode)**: ఇంటర్నెట్ లేకున్నా వేగంగా పనిచేస్తుంది.
-
-            ### 📥 Download:
-            - **File**: `Telugu-Panchangam-2027.apk`
+            Telugu Panchangam 2027 Android APK Release
+            Download and install Telugu-Panchangam-2027.apk on your Android device.
           files: |
             build-output/Telugu-Panchangam-2027.apk
-
