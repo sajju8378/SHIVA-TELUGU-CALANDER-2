@@ -109,42 +109,57 @@ export const ApkDownloadBanner: React.FC<ApkDownloadBannerProps> = ({
             </button>
           </div>
 
-          {/* OPTION 2: DIRECT DOWNLOAD TELUGU PANCHANGAM APK */}
+          {/* OPTION 2: GITHUB ACTIONS BUILD APK ARTIFACT */}
           <div className="p-4 rounded-xl bg-slate-950/80 border border-emerald-700/60 space-y-2.5">
             <div className="flex items-center space-x-2 text-emerald-300 font-bold text-sm">
-              <Download className="w-4 h-4 text-emerald-400" />
-              <span>{isTe ? 'నేరుగా APK ఫైల్ డౌన్‌లోడ్ (Direct Download)' : 'Direct Standalone APK Download'}</span>
+              <Layers className="w-4 h-4 text-emerald-400" />
+              <span>{isTe ? 'GitHub Actions ద్వారా APK బిల్డ్ ఆర్టిఫాక్ట్' : 'GitHub Actions APK Build Artifact'}</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               {isTe
-                ? 'మెయిన్ రిపోజిటరీ నుండి నేరుగా Telugu-Panchangam-2027.apk ఫైల్ డౌన్‌లోడ్ అవుతుంది. ఎలాంటి Actions లేదా లాగిన్ అవసరం లేదు.'
-                : 'Directly download the Telugu-Panchangam-2027.apk file hosted on the main branch.'}
+                ? 'GitHub Actions లో స్వయంచాలకంగా Gradle ద్వారా నిజమైన Android APK బిల్డ్ చేయబడి ఆర్టిఫాక్ట్‌గా భద్రపరచబడుతుంది. మీరు GitHub Actions పేజీ నుండి కూడా తాజా APKని పొందవచ్చు.'
+                : 'Built directly via GitHub Actions CI/CD using Gradle into an official signed APK package, preserved under Workflow Artifacts.'}
             </p>
-            <div className="pt-1">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <a
+                href="https://github.com/sajju8378/SHIVA-TELUGU-CALANDER/actions"
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-emerald-950/70 border border-emerald-600 hover:bg-emerald-900 text-emerald-200 font-semibold text-xs transition-colors"
+              >
+                <span>{isTe ? 'GitHub Actions ఆర్టిఫాక్ట్స్ చూడండి' : 'Open GitHub Actions Artifacts'}</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
               <button
                 onClick={handleDownload}
-                className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-bold text-sm shadow-md transition-all cursor-pointer"
+                className="flex-1 flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer"
               >
-                {downloadTriggered ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                {downloadTriggered ? <Check className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
                 <span>
                   {downloadTriggered
-                    ? (isTe ? 'డౌన్‌లోడ్ ప్రారంభమైంది!' : 'Download Started!')
-                    : (isTe ? 'Telugu-Panchangam-2027.apk డౌన్‌లోడ్ చేయండి' : 'Download Telugu-Panchangam-2027.apk')}
+                    ? (isTe ? 'డౌన్‌లోడ్ అవుతోంది...' : 'Downloading...')
+                    : (isTe ? 'నేరుగా APK డౌన్‌లోడ్' : 'Direct APK Download')}
                 </span>
               </button>
             </div>
           </div>
 
-          {/* Installation Tips */}
-          <div className="space-y-1.5 text-xs text-slate-400 bg-slate-950/50 p-3 rounded-xl border border-slate-800">
+          {/* Installation Tips & Parse Error Explanation */}
+          <div className="space-y-2 text-xs text-slate-400 bg-slate-950/70 p-3.5 rounded-xl border border-amber-900/40">
             <div className="font-semibold text-amber-300 flex items-center space-x-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>{isTe ? 'గమనిక:' : 'Note:'}</span>
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span>{isTe ? 'ముఖ్య గమనిక (Parse Error రాకుండా):' : 'Important Note (Avoid Parse Error):'}</span>
             </div>
-            <p>
+            <p className="leading-relaxed text-slate-300">
               {isTe
-                ? 'ఫోన్‌లో ఇన్స్టాలేషన్ సమయంలో "Unknown sources" అనుమతి అడిగితే Enable చేయండి.'
-                : 'If Android prompts with "Install unknown apps", toggle Allow from this source to complete installation.'}
+                ? 'గమనిక: 1.5KB ఉండే ఫైల్ డమ్మీ ప్లేస్‌హోల్డర్ మాత్రమే, అందుకే ఆండ్రాయిడ్‌లో "Error while parsing the package" వస్తుంది. నిజమైన పూర్తి యాప్‌ను ఎటువంటి ఎర్రర్ లేకుండా ఉపయోగించడానికి పైన ఉన్న "1. సిఫార్సు: హోమ్ స్క్రీన్‌పై 1-క్లిక్ ఇన్‌స్టాల్" బటన్ నొక్కండి!'
+                : 'Notice: A 1.5KB file is only a stub placeholder, which triggers Android\'s "There was a problem parsing the package". To get the 100% working app without any parse errors, use "1. 1-Click Install to Phone Home Screen" above!'}
+            </p>
+            <p className="text-[11px] text-amber-200/70">
+              {isTe
+                ? 'లేదా మీ మొబైల్ బ్రౌజర్ పైన కుడివైపు 3 చుక్కలు (⋮) నొక్కి "Add to Home screen" లేదా "Install App" ఎంచుకుంటే చాలు, వెంటనే యాప్ ఐకాన్ వస్తుంది.'
+                : 'Or tap browser menu (⋮) and select "Install app" or "Add to Home screen". Works instantly offline.'}
             </p>
           </div>
 
